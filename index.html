@@ -23,7 +23,7 @@
             justify-content: center;
             margin: 0;
             padding: 10px;
-            overflow-x: hidden; /* 嚴禁橫向捲動 */
+            overflow-x: hidden;
             box-sizing: border-box;
         }
 
@@ -55,19 +55,19 @@
             margin: auto;
         }
 
-        /* 播放器外框優化 */
+        /* 播放器外框 */
         .player-wrapper {
             position: relative;
             border-radius: 20px;
             overflow: hidden;
             background: #000;
-            height: 152px; /* 電腦版高度 */
-            width: 100%;
+            height: 152px; 
+            width: 100% !important;
             box-shadow: inset 0 0 20px rgba(251, 146, 60, 0.1);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
-        /* 遮罩：露出右側播放區域 */
+        /* 遮罩：移至左側，露出右側播放區域 */
         .mystery-shutter {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -78,11 +78,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* 預設電腦版遮罩：遮蔽左側 70% */
-            padding-right: 30%; 
-            clip-path: polygon(0% 0%, 70% 0%, 70% 100%, 0% 100%);
+            padding-right: 35%; 
+            clip-path: polygon(0% 0%, 65% 0%, 65% 100%, 0% 100%);
             transition: all 0.3s ease;
-            border-right: 1px solid rgba(245, 158, 11, 0.3);
+            border-right: 1.5px solid rgba(245, 158, 11, 0.3);
         }
 
         .mystery-shutter:hover { background: rgba(35, 25, 15, 1); }
@@ -120,21 +119,32 @@
             transition: all 0.3s;
         }
 
-        /* 手機版針對性優化 */
+        /* 備註樣式 */
+        .landscape-tip {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px dashed rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+            font-size: 11px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            margin-top: 16px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* 手機版樣式優化 */
         @media (max-width: 640px) {
             .main-card { padding: 20px; }
             .player-wrapper { 
-                height: 80px; /* 手機迷你模式 */
-                margin-bottom: 20px;
+                height: 80px; 
             } 
             .mystery-shutter {
-                /* 手機版播放鍵在右側，遮罩縮短至 55%，絕對不擋按鈕 */
-                padding-right: 45%; 
-                clip-path: polygon(0% 0%, 55% 0%, 55% 100%, 0% 100%);
+                /* 手機版遮罩再往左退一點，確保看到播放鍵 */
+                padding-right: 50%; 
+                clip-path: polygon(0% 0%, 50% 0%, 50% 100%, 0% 100%);
             }
             .pulse-icon { width: 32px; height: 32px; }
             .pulse-icon span { font-size: 0.9rem; }
-            .mystery-shutter span.text-hint { font-size: 10px; }
         }
     </style>
 </head>
@@ -155,9 +165,9 @@
         <div class="mb-6">
             <div class="flex justify-between items-baseline mb-2">
                 <span id="progress-text" class="text-xs md:text-sm font-bold text-orange-100 opacity-90">第 01 / 10 題</span>
-                <span class="text-[9px] font-bold text-[#f59e0b] px-2 py-0.5 bg-[#f59e0b]/10 rounded border border-[#f59e0b]/20">挑戰進行中</span>
+                <span class="text-[9px] font-bold text-[#f59e0b] px-2 py-0.5 bg-[#f59e0b]/10 rounded border border-[#f59e0b]/20">正在挑戰中</span>
             </div>
-            <div class="w-full bg-black/40 h-1 rounded-full overflow-hidden">
+            <div class="w-full bg-black/40 h-1.5 rounded-full overflow-hidden">
                 <div id="progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-orange-600 transition-all duration-1000" style="width: 10%"></div>
             </div>
         </div>
@@ -167,7 +177,7 @@
             <div id="mystery-box" class="mystery-shutter">
                 <div class="flex flex-col items-center gap-1">
                     <div class="pulse-icon"><span class="text-lg text-[#f59e0b]">?</span></div>
-                    <span class="text-hint text-[10px] font-black text-[#f59e0b] tracking-[0.2em]">點擊揭曉</span>
+                    <span class="text-hint text-[10px] font-black text-[#f59e0b] tracking-[0.2em]">點擊揭曉答案</span>
                 </div>
             </div>
             <div id="player-frame" class="w-full h-full"></div>
@@ -179,9 +189,17 @@
                 <button id="btn-prev" class="btn-secondary flex-1 py-4 rounded-2xl text-[12px] font-bold disabled:opacity-5">上一題</button>
                 <button id="btn-next" class="btn-primary flex-[1.6] py-4 rounded-2xl text-[12px] font-bold">下一題</button>
             </div>
-            <p class="text-[9px] text-orange-200/40 tracking-[0.2em] font-medium text-center leading-relaxed">
-                右側區塊點選播放音樂<br>左側黑色區域揭曉正確答案
-            </p>
+            <div class="text-center">
+                <p class="text-[9px] text-orange-200/40 tracking-[0.2em] font-medium leading-relaxed uppercase">
+                    右側區塊播放 • 左側方塊揭曉
+                </p>
+            </div>
+
+            <!-- 手機橫向建議備註 -->
+            <div class="landscape-tip">
+                💡 <b>使用建議：</b><br>
+                若您使用手機且看不到播放按鈕，建議將螢幕<b>「橫向放置」</b>，並關閉直向鎖定以獲得最佳體驗。
+            </div>
         </div>
     </div>
 
@@ -223,7 +241,6 @@
             const isMobile = window.innerWidth <= 640;
             const embedHeight = isMobile ? 80 : 152;
             
-            // 同步調整高度，並確保寬度為 100%
             gameContainer.style.height = embedHeight + 'px';
 
             playerFrame.innerHTML = `
