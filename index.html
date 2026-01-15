@@ -3,28 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>音樂猜猜看挑戰 - 暖色行動優化版</title>
+    <title>音樂猜猜看挑戰 - 暖色行動最終優化版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Noto+Sans+TC:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
 
         :root {
             --brand-warm: #f59e0b;
             --brand-accent: #fb923c;
-            --bg-dark: #120b02;
         }
 
         body {
             background: radial-gradient(circle at top left, #7c2d12, #1c100b 40%, #0c0705 100%);
             color: white;
-            font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif;
+            font-family: 'Noto Sans TC', sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0;
-            overflow-x: hidden; /* 防止頁面左右滑動 */
-            padding: 1rem;
+            padding: 10px;
+            overflow-x: hidden; /* 嚴禁橫向捲動 */
             box-sizing: border-box;
         }
 
@@ -44,53 +43,54 @@
         }
 
         .main-card {
-            background: rgba(24, 15, 10, 0.7);
-            backdrop-filter: blur(25px) saturate(160%);
-            -webkit-backdrop-filter: blur(25px) saturate(160%);
+            background: rgba(24, 15, 10, 0.75);
+            backdrop-filter: blur(30px) saturate(160%);
+            -webkit-backdrop-filter: blur(30px) saturate(160%);
             border: 1px solid rgba(251, 146, 60, 0.15);
             border-radius: 32px;
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+            max-width: 420px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+            padding: 24px;
             margin: auto;
         }
 
-        /* 播放器容器 */
+        /* 播放器外框優化 */
         .player-wrapper {
             position: relative;
             border-radius: 20px;
             overflow: hidden;
             background: #000;
-            height: 152px; /* 電腦預設高度 */
+            height: 152px; /* 電腦版高度 */
             width: 100%;
-            box-shadow: inset 0 0 20px rgba(251, 146, 60, 0.05);
-            transition: height 0.3s ease;
+            box-shadow: inset 0 0 20px rgba(251, 146, 60, 0.1);
+            margin-bottom: 24px;
         }
 
-        /* 遮罩：露出播放按鈕區域 */
+        /* 遮罩：露出右側播放區域 */
         .mystery-shutter {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(30, 20, 15, 0.98);
-            backdrop-filter: blur(8px);
+            background: rgba(20, 15, 10, 0.98);
+            backdrop-filter: blur(10px);
             z-index: 30;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            /* 預設電腦版遮罩：遮蔽左側 70%，露出右側 30% */
+            /* 預設電腦版遮罩：遮蔽左側 70% */
             padding-right: 30%; 
             clip-path: polygon(0% 0%, 70% 0%, 70% 100%, 0% 100%);
-            transition: background 0.3s, clip-path 0.3s;
-            border-right: 1.5px solid rgba(245, 158, 11, 0.2);
+            transition: all 0.3s ease;
+            border-right: 1px solid rgba(245, 158, 11, 0.3);
         }
 
-        .mystery-shutter:hover { background: rgba(45, 30, 20, 1); }
+        .mystery-shutter:hover { background: rgba(35, 25, 15, 1); }
 
         .pulse-icon {
             width: 48px; height: 48px;
             background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
+            border: 1px solid rgba(245, 158, 11, 0.4);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             animation: pulse-ring 2s infinite;
@@ -98,7 +98,7 @@
 
         @keyframes pulse-ring {
             0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.2); }
-            50% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            50% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
         }
 
         .is-revealed .mystery-shutter { display: none; }
@@ -110,27 +110,31 @@
         }
         .btn-primary:hover:not(:disabled) {
             transform: scale(1.02);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
         }
 
         .btn-secondary {
             background: rgba(251, 146, 60, 0.05);
-            border: 1px solid rgba(251, 146, 60, 0.1);
+            border: 1px solid rgba(251, 146, 60, 0.15);
             color: #fdba74;
             transition: all 0.3s;
         }
 
-        /* 手機版樣式深度優化 */
+        /* 手機版針對性優化 */
         @media (max-width: 640px) {
-            .player-wrapper { height: 80px; } /* 手機版強制使用迷你高度 */
+            .main-card { padding: 20px; }
+            .player-wrapper { 
+                height: 80px; /* 手機迷你模式 */
+                margin-bottom: 20px;
+            } 
             .mystery-shutter {
-                /* 手機迷你播放器的播放鍵在右側，因此遮蔽左側 60% 即可 */
-                padding-right: 40%; 
-                clip-path: polygon(0% 0%, 60% 0%, 60% 100%, 0% 100%);
+                /* 手機版播放鍵在右側，遮罩縮短至 55%，絕對不擋按鈕 */
+                padding-right: 45%; 
+                clip-path: polygon(0% 0%, 55% 0%, 55% 100%, 0% 100%);
             }
-            .pulse-icon { width: 40px; height: 40px; }
-            .pulse-icon span { font-size: 1.1rem; }
-            .mystery-shutter span { font-size: 10px; }
+            .pulse-icon { width: 32px; height: 32px; }
+            .pulse-icon span { font-size: 0.9rem; }
+            .mystery-shutter span.text-hint { font-size: 10px; }
         }
     </style>
 </head>
@@ -141,29 +145,29 @@
         <div class="blob blob-2"></div>
     </div>
 
-    <div id="app" class="main-card p-6 md:p-10">
-        <header class="text-center mb-6 md:mb-8">
-            <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-b from-white to-orange-200 bg-clip-text text-transparent">音樂猜猜看</h1>
-            <div class="h-1 w-10 bg-[#f59e0b] mx-auto mt-2 rounded-full"></div>
+    <div id="app" class="main-card">
+        <header class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-black tracking-tight bg-gradient-to-b from-white to-orange-200 bg-clip-text text-transparent">音樂猜猜看</h1>
+            <div class="h-1 w-12 bg-[#f59e0b] mx-auto mt-2 rounded-full"></div>
         </header>
 
         <!-- 進度指示 -->
-        <div class="mb-6 md:mb-8">
-            <div class="flex justify-between items-baseline mb-3">
-                <span id="progress-text" class="text-xs md:text-sm font-bold text-orange-100 tracking-wide">第 01 / 10 題</span>
-                <span class="text-[8px] md:text-[9px] font-bold text-[#f59e0b] px-2 py-0.5 bg-[#f59e0b]/10 rounded border border-[#f59e0b]/20">挑戰進行中</span>
+        <div class="mb-6">
+            <div class="flex justify-between items-baseline mb-2">
+                <span id="progress-text" class="text-xs md:text-sm font-bold text-orange-100 opacity-90">第 01 / 10 題</span>
+                <span class="text-[9px] font-bold text-[#f59e0b] px-2 py-0.5 bg-[#f59e0b]/10 rounded border border-[#f59e0b]/20">挑戰進行中</span>
             </div>
-            <div class="w-full bg-orange-950/40 h-1.5 rounded-full overflow-hidden">
+            <div class="w-full bg-black/40 h-1 rounded-full overflow-hidden">
                 <div id="progress-bar" class="h-full bg-gradient-to-r from-amber-500 to-orange-600 transition-all duration-1000" style="width: 10%"></div>
             </div>
         </div>
 
         <!-- 播放器與遮罩區域 -->
-        <div id="game-container" class="player-wrapper mb-6 md:mb-8">
+        <div id="game-container" class="player-wrapper">
             <div id="mystery-box" class="mystery-shutter">
-                <div class="flex flex-col items-center gap-1 md:gap-2">
-                    <div class="pulse-icon"><span class="text-lg md:text-xl text-[#f59e0b]">?</span></div>
-                    <span class="text-[10px] md:text-[11px] font-black text-[#f59e0b] tracking-[0.2em]">點擊揭曉答案</span>
+                <div class="flex flex-col items-center gap-1">
+                    <div class="pulse-icon"><span class="text-lg text-[#f59e0b]">?</span></div>
+                    <span class="text-hint text-[10px] font-black text-[#f59e0b] tracking-[0.2em]">點擊揭曉</span>
                 </div>
             </div>
             <div id="player-frame" class="w-full h-full"></div>
@@ -172,11 +176,11 @@
         <!-- 按鈕操作區 -->
         <div class="flex flex-col gap-4">
             <div class="flex gap-2 md:gap-3">
-                <button id="btn-prev" class="btn-secondary flex-1 py-3 md:py-4 rounded-2xl text-[11px] md:text-[12px] font-bold disabled:opacity-5">上一題</button>
-                <button id="btn-next" class="btn-primary flex-[1.6] py-3 md:py-4 rounded-2xl text-[11px] md:text-[12px] font-bold">下一題</button>
+                <button id="btn-prev" class="btn-secondary flex-1 py-4 rounded-2xl text-[12px] font-bold disabled:opacity-5">上一題</button>
+                <button id="btn-next" class="btn-primary flex-[1.6] py-4 rounded-2xl text-[12px] font-bold">下一題</button>
             </div>
-            <p class="text-[9px] md:text-[10px] text-orange-200/40 tracking-[0.2em] font-medium text-center">
-                右側區塊播放 • 左側方塊揭曉
+            <p class="text-[9px] text-orange-200/40 tracking-[0.2em] font-medium text-center leading-relaxed">
+                右側區塊點選播放音樂<br>左側黑色區域揭曉正確答案
             </p>
         </div>
     </div>
@@ -219,12 +223,12 @@
             const isMobile = window.innerWidth <= 640;
             const embedHeight = isMobile ? 80 : 152;
             
-            // 同步調整容器高度
+            // 同步調整高度，並確保寬度為 100%
             gameContainer.style.height = embedHeight + 'px';
 
             playerFrame.innerHTML = `
                 <iframe 
-                    style="border-radius:12px; width: 100%; border: none; display: block;" 
+                    style="border-radius:12px; width: 100% !important; max-width: 100%; border: none; display: block;" 
                     src="https://open.spotify.com/embed/track/${currentSong.id}?utm_source=generator" 
                     height="${embedHeight}" 
                     frameBorder="0" 
@@ -259,13 +263,12 @@
             }
         });
 
+        let resizeTimer;
         window.addEventListener('resize', () => {
-            const isMobile = window.innerWidth <= 640;
-            const currentIframe = playerFrame.querySelector('iframe');
-            if (currentIframe) {
-                const targetHeight = isMobile ? "80" : "152";
-                if (currentIframe.getAttribute('height') !== targetHeight) updateGame();
-            }
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                updateGame();
+            }, 300);
         });
 
         window.onload = () => {
