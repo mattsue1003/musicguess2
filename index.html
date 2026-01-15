@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>音樂猜猜看挑戰 - 暖色增強版</title>
+    <title>音樂猜猜看挑戰 - 暖色行動優化版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Noto+Sans+TC:wght@400;700&display=swap');
@@ -23,7 +23,7 @@
             align-items: center;
             justify-content: center;
             margin: 0;
-            overflow: hidden; /* 防止整個頁面左右滑動 */
+            overflow-x: hidden; /* 防止頁面左右滑動 */
             padding: 1rem;
             box-sizing: border-box;
         }
@@ -55,37 +55,37 @@
             margin: auto;
         }
 
-        /* 播放器外框：手機與電腦統一高度，解決 UI 跑版問題 */
+        /* 播放器容器 */
         .player-wrapper {
             position: relative;
             border-radius: 20px;
             overflow: hidden;
             background: #000;
-            height: 152px; 
+            height: 152px; /* 電腦預設高度 */
             width: 100%;
             box-shadow: inset 0 0 20px rgba(251, 146, 60, 0.05);
+            transition: height 0.3s ease;
         }
 
-        /* 遮罩：移至左側，精確延伸到播放鍵左邊 */
+        /* 遮罩：露出播放按鈕區域 */
         .mystery-shutter {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(30, 20, 15, 0.96);
-            backdrop-filter: blur(6px);
+            background: rgba(30, 20, 15, 0.98);
+            backdrop-filter: blur(8px);
             z-index: 30;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            /* 調整內容置中位置 */
-            padding-right: 35%; 
-            /* 遮住左側 65%，保留右側 35% 給播放區域 */
-            clip-path: polygon(0% 0%, 65% 0%, 65% 100%, 0% 100%);
-            transition: background 0.3s;
-            border-right: 1.5px solid rgba(245, 158, 11, 0.25);
+            /* 預設電腦版遮罩：遮蔽左側 70%，露出右側 30% */
+            padding-right: 30%; 
+            clip-path: polygon(0% 0%, 70% 0%, 70% 100%, 0% 100%);
+            transition: background 0.3s, clip-path 0.3s;
+            border-right: 1.5px solid rgba(245, 158, 11, 0.2);
         }
 
-        .mystery-shutter:hover { background: rgba(45, 30, 20, 0.98); }
+        .mystery-shutter:hover { background: rgba(45, 30, 20, 1); }
 
         .pulse-icon {
             width: 48px; height: 48px;
@@ -120,13 +120,17 @@
             transition: all 0.3s;
         }
 
-        /* 手機版樣式優化 */
+        /* 手機版樣式深度優化 */
         @media (max-width: 640px) {
+            .player-wrapper { height: 80px; } /* 手機版強制使用迷你高度 */
             .mystery-shutter {
-                /* 手機版預留更多右側點擊空間 (40%) */
+                /* 手機迷你播放器的播放鍵在右側，因此遮蔽左側 60% 即可 */
                 padding-right: 40%; 
                 clip-path: polygon(0% 0%, 60% 0%, 60% 100%, 0% 100%);
             }
+            .pulse-icon { width: 40px; height: 40px; }
+            .pulse-icon span { font-size: 1.1rem; }
+            .mystery-shutter span { font-size: 10px; }
         }
     </style>
 </head>
@@ -202,7 +206,6 @@
         const btnNext = document.getElementById('btn-next');
         const gameContainer = document.getElementById('game-container');
 
-        // 洗牌演算法
         function shuffleSongs() {
             songs = [...originalSongs];
             for (let i = songs.length - 1; i > 0; i--) {
@@ -211,16 +214,17 @@
             }
         }
 
-        // 更新遊戲內容
         function updateGame() {
             const currentSong = songs[currentIndex];
+            const isMobile = window.innerWidth <= 640;
+            const embedHeight = isMobile ? 80 : 152;
             
-            // 統一高度為 152，避免播放器 UI 變形
-            const embedHeight = 152;
-            
+            // 同步調整容器高度
+            gameContainer.style.height = embedHeight + 'px';
+
             playerFrame.innerHTML = `
                 <iframe 
-                    style="border-radius:12px; width: 100%; border: none;" 
+                    style="border-radius:12px; width: 100%; border: none; display: block;" 
                     src="https://open.spotify.com/embed/track/${currentSong.id}?utm_source=generator" 
                     height="${embedHeight}" 
                     frameBorder="0" 
@@ -236,16 +240,12 @@
             btnNext.innerText = (currentIndex === songs.length - 1) ? "重新洗牌" : "下一題";
         }
 
-        // 事件監聽
         mysteryBox.addEventListener('click', () => {
             gameContainer.classList.add('is-revealed');
         });
 
         btnPrev.addEventListener('click', () => {
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateGame();
-            }
+            if (currentIndex > 0) { currentIndex--; updateGame(); }
         });
 
         btnNext.addEventListener('click', () => {
@@ -259,9 +259,13 @@
             }
         });
 
-        // 監聽視窗縮放以確保寬度正常
         window.addEventListener('resize', () => {
-            // 在視窗變動時確保不需要滑動
+            const isMobile = window.innerWidth <= 640;
+            const currentIframe = playerFrame.querySelector('iframe');
+            if (currentIframe) {
+                const targetHeight = isMobile ? "80" : "152";
+                if (currentIframe.getAttribute('height') !== targetHeight) updateGame();
+            }
         });
 
         window.onload = () => {
